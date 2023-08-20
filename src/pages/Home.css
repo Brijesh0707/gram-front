@@ -52,6 +52,7 @@
     background-color: rgb(237, 119, 119);
     color: black;
     background-color: white;
+    cursor: pointer;
   }
   
   #likes {

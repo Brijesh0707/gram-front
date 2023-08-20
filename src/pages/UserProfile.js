@@ -9,6 +9,7 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowButtonDisabled, setIsFollowButtonDisabled] = useState(false);
 
   const fetchUserData = async () => {
     try {
@@ -33,6 +34,12 @@ const UserProfile = () => {
   };
 
   const handleFollow = async () => {
+    if (isFollowButtonDisabled) {
+      return; // Do nothing if the button is disabled
+    }
+
+    setIsFollowButtonDisabled(true); // Disable the button during the fetch
+
     try {
       const response = await fetch("https://social-gram2.onrender.com/follows", {
         method: "PUT",
@@ -48,16 +55,24 @@ const UserProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        fetchUserData(); 
+        fetchUserData();
       } else {
         console.error('Error following user:', data.error);
       }
     } catch (error) {
       console.error('Error following user:', error);
     }
+
+    setIsFollowButtonDisabled(false); // Enable the button after the fetch
   };
 
   const handleUnfollow = async () => {
+    if (isFollowButtonDisabled) {
+      return; // Do nothing if the button is disabled
+    }
+
+    setIsFollowButtonDisabled(true); // Disable the button during the fetch
+
     try {
       const response = await fetch("https://social-gram2.onrender.com/unfollows", {
         method: "PUT",
@@ -73,19 +88,20 @@ const UserProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        fetchUserData(); 
+        fetchUserData();
       } else {
         console.error('Error unfollowing user:', data.error);
       }
     } catch (error) {
       console.error('Error unfollowing user:', error);
     }
+
+    setIsFollowButtonDisabled(false); // Enable the button after the fetch
   };
 
   useEffect(() => {
     fetchUserData();
   }, []);
-
 
   const loggedInUserId = JSON.parse(localStorage.getItem("user"))._id;
   const isUserFollowing = user && user.followers.includes(loggedInUserId);
@@ -106,12 +122,23 @@ const UserProfile = () => {
       </div><br />
       <div className='follows'>
         {isUserFollowing ? (
-          <button id='unfollow-1' onClick={handleUnfollow}>UnFollow</button>
+          <button
+            id='unfollow-1'
+            onClick={handleUnfollow}
+            disabled={isFollowButtonDisabled}
+          >
+            Unfollow
+          </button>
         ) : (
-          <button id='follow-1' onClick={handleFollow}>Follow</button>
+          <button
+            id='follow-1'
+            onClick={handleFollow}
+            disabled={isFollowButtonDisabled}
+          >
+            Follow
+          </button>
         )}
       </div>
-      
       <div className='post-menu'>
         {posts.map((post, index) => (
           <div key={index} className="post-container">

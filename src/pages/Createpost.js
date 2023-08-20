@@ -9,6 +9,7 @@ const Createpost = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [body, setBody] = useState('');
   const [image, setImage] = useState(null);
+  const [isShareButtonDisabled, setIsShareButtonDisabled] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,63 +25,60 @@ const Createpost = () => {
     setImage(file);
   };
 
-  const postData = () => {
-  
+  const postData = async () => {
     if (!body || !image) {
       toast.error('Please fill in all fields');
       return;
     }
 
+    setIsShareButtonDisabled(true); // Disable the "Share" button during the post data submission
 
-    const data = new FormData();
-    data.append('file', image);
-    data.append('upload_preset', 'kklpbnzc');
-    data.append('cloud_name', 'brijesh070707');
+    try {
+      const data = new FormData();
+      data.append('file', image);
+      data.append('upload_preset', 'kklpbnzc');
+      data.append('cloud_name', 'brijesh070707');
 
-    fetch('https://api.cloudinary.com/v1_1/brijesh070707/image/upload', {
-      method: 'post',
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const imageUrl = data.url;
-
-       
-        fetch('https://social-gram2.onrender.com/createpost', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + localStorage.getItem('jwt'),
-          },
-          body: JSON.stringify({
-            body,
-            photo1: imageUrl,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.error) {
-              toast.error('Error creating post');
-            } else {
-              toast.success('Post saved successfully! Redirecting...');
-              setTimeout(() => {
-                navigate('/');
-              }, 5000); 
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error('An error occurred while creating the post');
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error('An error occurred while uploading the image');
+      const imageUploadResponse = await fetch('https://api.cloudinary.com/v1_1/brijesh070707/image/upload', {
+        method: 'post',
+        body: data,
       });
+
+      const imageUploadData = await imageUploadResponse.json();
+      const imageUrl = imageUploadData.url;
+
+      const createPostResponse = await fetch('https://social-gram2.onrender.com/createpost', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+        },
+        body: JSON.stringify({
+          body,
+          photo1: imageUrl,
+        }),
+      });
+
+      const createPostData = await createPostResponse.json();
+
+      if (createPostResponse.ok) {
+        toast.success('Post saved successfully! Redirecting...');
+        setTimeout(() => {
+          navigate('/');
+        }, 5000);
+      } else {
+        console.error('Error creating post:', createPostData.error);
+        toast.error('Error creating post');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast.error('An error occurred while creating the post');
+    }
+
+    setIsShareButtonDisabled(false); // Enable the "Share" button after the post data submission
   };
 
   const handleShareClick = () => {
-
     postData();
   };
 
@@ -88,7 +86,9 @@ const Createpost = () => {
     <div className='main-3'>
       <div className='createpost'>
         <h5>Create New Post</h5>
-        <button onClick={handleShareClick}>Share</button>
+        <button onClick={handleShareClick} disabled={isShareButtonDisabled}>
+          Share
+        </button>
       </div>
       <div className='images-1'>
         {selectedImage ? (

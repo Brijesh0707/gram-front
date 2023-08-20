@@ -58,6 +58,7 @@
  .follows{
   width: 600px;
   border-bottom: 1px solid black;
+  cursor: pointer;
  }
  .follows button{
   margin-bottom: 10px;
@@ -65,6 +66,7 @@
   text-align: center;
   justify-content: center;
   margin-left: 150px;
+  cursor: pointer;
  }
 
  #follow-1{
@@ -72,6 +74,7 @@
   height: 30px;
   background-color: white;
   border: 1px solid black;
+  cursor: pointer;
  }
 
  #unfollow-1{
@@ -80,6 +83,7 @@
   background-color: rgb(62, 62, 218);
   border: 1px solid black;
   color: white;
+  cursor: pointer;
  }
 
 
