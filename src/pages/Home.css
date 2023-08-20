@@ -1,4 +1,4 @@
-/* Home.css */
+
 .home-container {
     position: relative;
     z-index: 0;
@@ -61,7 +61,13 @@
   .userprofile {
     color: black !important;
   }
-  
+  .loading-indicator {
+    position: absolute;
+    width: 100px;
+    left: 50%;
+    right: -50%;
+
+  }
   @media (max-width: 767px) {
     .cards {
       width: 380px;
